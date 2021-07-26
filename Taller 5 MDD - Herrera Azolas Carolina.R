@@ -35,7 +35,7 @@ library(class)
 
 ## Elegimos las variables para el análisis y las que son categóricas se normalizan
 
-datos_adaptados <- as.data.frame(cbind(
+datos_adaptados <- as.data.frame(cbind(age = datos$age,
   historial_delay = (datos$history == 0),
   historial_critic = (datos$history == 1),
   historial_new =(datos$history ==2),
@@ -46,6 +46,7 @@ datos_adaptados <- as.data.frame(cbind(
   foreign = datos$foreign,
   credit = datos$credit,
   persons=datos$persons))
+
 # Normalizamos los datos
 normalize <- function(x) { return ((x - min(x)) / (max(x) - min(x))) }
 
@@ -95,14 +96,14 @@ view(datos_adaptados
      %>% group_by(cluster)
      %>% summarise_all(mean))
 
-# K Means con K = 6
+# K Means con K = 5
 
-k6 <- kmeans(datos_norm1,
-             centers = 6,
+k5 <- kmeans(datos_norm1,
+             centers = 5,
              nstart = 25)
 
 ## Agregamos la columna cluster a la tabla original de variables elegidas
-datos_adaptados$cluster <- k6$cluster
+datos_adaptados$cluster <- k5$cluster
 
 
 view(datos_adaptados
@@ -131,15 +132,16 @@ datos_adaptados2 <- as.data.frame(cbind(savings = datos$savings,
                                        employed = datos$employed,
                                        job = datos$job,
                                        foreign = datos$foreign,
-                                       credit = datos$credit))
+                                       credit = datos$credit,
+                                       persons = datos$persons))
 
 # Normalizamos los datos
 normalize <- function(x) { return ((x - min(x)) / (max(x) - min(x))) }
-datos_norm2 <- as.data.frame(lapply(datos_adaptados, normalize))
+datos_norm2 <- as.data.frame(lapply(datos_adaptados2, normalize))
 
 ## Elegimos el K
 
-clusters2 <- c(1,2,3,4,5,6,7,8,9,10)
+clusters <- c(1,2,3,4,5,6,7,8,9,10)
 codo <- c(0,0,0,0,0,0,0,0,0,0)
 for (k in 1:10) { 
   codo[k] <- kmeans(datos_norm2,
@@ -153,7 +155,7 @@ plot(clusters, codo, type = "l")
 
 
 ## Aplicamos silueta
-silueta2 <- c(0,0,0,0,0,0,0,0,0,0)
+silueta <- c(0,0,0,0,0,0,0,0,0,0)
 for (k in 2:10) { 
   modelo_aux2 <- kmeans(datos_norm2,
                        centers = k,
@@ -163,6 +165,47 @@ for (k in 2:10) {
 }
 
 ## Gráficamos silueta
-plot(clusters2, silueta2, type = "l")
+plot(clusters, silueta, type = "l")
 
+# K Means con K = 5
+
+k5Caso2 <- kmeans(datos_norm2,
+             centers = 5,
+             nstart = 25)
+
+## Agregamos la columna cluster a la tabla original de variables elegidas
+datos_adaptados2$cluster <- k5Caso2$cluster
+
+
+view(datos_adaptados2
+     %>% group_by(cluster)
+     %>% summarise_all(mean))
+
+# K Means con K = 2
+
+k2Caso2 <- kmeans(datos_norm2,
+                  centers = 2,
+                  nstart = 25)
+
+## Agregamos la columna cluster a la tabla original de variables elegidas
+datos_adaptados2$cluster <- k2Caso2$cluster
+
+
+view(datos_adaptados2
+     %>% group_by(cluster)
+     %>% summarise_all(mean))
+
+# K Means con K = 3
+
+k3Caso2 <- kmeans(datos_norm2,
+                  centers = 3,
+                  nstart = 25)
+
+## Agregamos la columna cluster a la tabla original de variables elegidas
+datos_adaptados2$cluster <- k3Caso2$cluster
+
+
+view(datos_adaptados2
+     %>% group_by(cluster)
+     %>% summarise_all(mean))
 
